@@ -5,25 +5,19 @@
 trigger:
 - main
 
-resources:
-- repo: self
-
 variables:
-  # Container registry service connection established during pipeline creation
   imageRepository: 'tetrisgameapp'
   containerRegistry: 'cicd1904.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
-
-  # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
 stages:
 - stage: Build
-  displayName: Build and push stage
+  displayName: Build and Push Stage
   jobs:
   - job: Build
-    displayName: Build
+    displayName: Build Job
     pool:
       vmImage: $(vmImageName)
     steps:
@@ -34,7 +28,7 @@ stages:
         echo "Building the Docker image..."
         docker build -t $(containerRegistry)/$(imageRepository):$(tag) -f $(dockerfilePath) .
 
-        echo "Pushing the image to ACR..."
+        echo "Pushing the Docker image..."
         docker push $(containerRegistry)/$(imageRepository):$(tag)
-      displayName: 'Build and Push Docker Image Manually'
+      displayName: 'Build and Push Docker Image'
 
