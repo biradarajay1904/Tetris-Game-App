@@ -10,7 +10,6 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '1ee13c5a-6c0c-4d4e-9692-777f403ebca6'
   imageRepository: 'tetrisgameapp'
   containerRegistry: 'cicd1904.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
@@ -28,12 +27,14 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+    - script: |
+        echo "Logging in to ACR..."
+        echo "$(DOCKER_PASSWORD)" | docker login $(containerRegistry) -u $(DOCKER_USERNAME) --password-stdin
+
+        echo "Building the Docker image..."
+        docker build -t $(containerRegistry)/$(imageRepository):$(tag) -f $(dockerfilePath) .
+
+        echo "Pushing the image to ACR..."
+        docker push $(containerRegistry)/$(imageRepository):$(tag)
+      displayName: 'Build and Push Docker Image Manually'
+
