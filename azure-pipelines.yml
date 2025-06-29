@@ -29,5 +29,3 @@ stages:
 
           echo "Pushing the Docker image..."
           docker push $(containerRegistry)/$(imageRepository):$(tag)
-
-
